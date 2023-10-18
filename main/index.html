@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" href="static/favicon.ico">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://api.mapbox.com/mapbox-gl-js/v2.10.0/mapbox-gl.css" rel="stylesheet">
+    <script src="https://api.mapbox.com/mapbox-gl-js/v2.10.0/mapbox-gl.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Load the `mapbox-gl-geocoder` plugin. -->
+    <script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.min.js"></script>
+    <link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.css" type="text/css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <script src="static/colorjoe.min.js"></script>
+    <link rel="stylesheet" href="static/colorjoe.css">
+    <title>3D BIM Foco en Obra</title>
+</head>
+<body>    
+    <div class="relative w-screen h-screen" id="viewer-container"></div>
+    
+    <div class="ifc-tree-menu" id="ifc-tree-menu">
+      <ul id="myUL">
+        <li id="tree-root">
+          <span class="caret">Beverages</span>
+          <ul class="nested">
+            <li>Water</li>
+            <li>Coffee</li>
+            <li>
+              <span class="caret">Tea</span>
+              <ul class="nested">
+                <li>Black Tea</li>
+                <li>White Tea</li>
+                <li><span class="caret">Green Tea</span>
+                  <ul class="nested">
+                    <li>Sencha</li>
+                    <li>Gyokuro</li>
+                    <li>Matcha</li>
+                    <li>Pi Lo Chun</li>
+                  </ul>
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+    
+    <div class="ifc-property-menu" id="ifc-property-menu">
+      <div class="ifc-property-item">
+        <div>Key</div>
+        <div class="ifc-property-value">Value</div>
+      </div>
+      <div id="ifc-property-menu-root"></div>
+    </div>
+    
+    <div class="hidden absolute top-0 left-0 w-screen h-screen z-50 flex justify-center items-center bg-neutral-500 bg-opacity-50" id="progress-container">
+      <div class="p-2 bg-white rounded-xl shadow-xl flex flex-col justify-center items-center gap-2 text-2xl">
+        <div class="flex justify-center items-center gap-2">
+          <p id="progress-label"></p>
+          <p id="progress-text"></p>
+        </div>
+        <img src ="static/loading.svg" alt="Loading IFC.js..."/>
+      </div>
+    </div>
+
+    <div class="absolute top-2 right-2 z-10 flex flex-col items-start gap-2">
+      <div class="flex flex-col items-start gap-2 p-2 rounded-xl shadow-xl">
+        <button class="button w-full px-4 py-2 bg-blue-500 text-white rounded-xl shadow-xl flex justify-left items-center gap-2 disabled:bg-blue-300" id="sample-button">
+          <span class="material-icons material-symbols-outlined">
+              home
+          </span>
+          Modelo ejemplo
+        </button>
+        <!-- <div class="w-full text-center">OR</div> -->
+        <input class="hidden" type="file" id="file-input">
+        <button class="button w-full px-4 py-2 bg-blue-500 text-white rounded-xl shadow-xl flex justify-left items-center gap-2 disabled:bg-blue-300" id="save-button">
+          <span class="material-icons material-symbols-outlined">
+              upload_file
+          </span>
+          Abrir modelo
+        </button>
+        <button class="button px-4 py-2 bg-red-500 text-white rounded-xl shadow-xl flex justify-left items-center gap-2 disabled:bg-red-300" id="remove-button">
+          <span class="material-icons material-symbols-outlined">
+              delete
+          </span>
+          Remover modelo
+        </button>
+      </div>
+    </div>
+
+    <div class="absolute vertical-center left-2 z-10 flex flex-col items-start gap-2">
+      <div class="hidden flex flex-col items-start gap-2 p-2 bg-neutral-300 rounded-xl shadow-xl" id="guide-container">
+        <table class="table-fixed">
+          <thead>
+            <tr>
+              <th colspan="2">
+                Cómo usar:
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th align="left" valign="top">3D MapBox:</th>              
+              <td>Visualice el modelo dentro de un mapa 3D</td>              
+            </tr> 
+            <tr>
+              <th align="left" valign="top">Dimensiones: </th>
+              <td>1. Haga doble clic en el punto de partida. <br/> 2. Haga clic en el punto final. <br/> 3. Repita los pasos anteriores con otros puntos. <br/> 4.presione 'Dimensiones', Delete o Backspace para cancelar</td>                       
+            </tr>             
+            <tr>
+              <th align="left" valign="top">Recortar: </th>
+              <td>1. Haga dobleclick en el elemento y/o presione 'P' <br/> 2. Repita los pasos anteriores con otros puntos. <br/> 3. Para eliminar selecciona la flecha de recorte y presiona 'O'.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="absolute bottom-2 left-2 z-10 flex flex-col items-end gap-2">
+      <div class="hidden p-2 bg-white rounded-xl shadow-xl w-fit" id="palette-container">
+        <div class="colorjoe"></div>
+      </div>
+      <div class="hidden p-2 bg-white rounded-xl shadow-xl max-w-[50vh] max-h-[50vh] overflow-y-scroll" id="properties-container"></div>
+    </div>
+
+    <div class="absolute bottom-2 right-2 z-10 flex flex-col items-start gap-2">
+      <div class="flex flex-col items-start gap-2 p-2 rounded-xl shadow-xl">
+        <button class="button bottom-56 z-10 p-4 bg-blue-500 text-white rounded-full shadow-xl flex items-center justify-center" id="abierto-button"  title="Abierto">
+            <a class="flex items-center justify-center">
+                <span class="material-icons material-icons-outlined">
+                window
+                </span>           
+            </a>
+        </button>
+        <button class="button bottom-40 z-10 p-4 bg-purple-500 text-white rounded-full shadow-xl flex items-center justify-center" id="proceso-button"  title="En Proceso">
+            <a class="flex items-center justify-center">
+                <span class="material-icons material-icons-outlined">
+                engineering
+                </span>          
+            </a>
+        </button>
+        <button class="button bottom-24 z-10 p-4 bg-yellow-500 text-white rounded-full shadow-xl flex items-center justify-center" id="pendiente-button"  title="Pendiente">
+            <a class="flex items-center justify-center">
+                <span class="material-icons material-icons-outlined" >
+                warning
+                </span>
+            </a>
+        </button>
+        <button class="button bottom-8 z-10 p-4 bg-red-500 text-white rounded-full shadow-xl flex items-center justify-center" id="noconformidad-button"  title="No Conformidad">
+            <a class="flex items-center justify-center">
+                <span class="material-icons material-icons-outlined">
+                error 
+                </span> 
+            </a>
+        </button>
+      </div>
+    </div>
+
+  <div class="simple-card-container bottom">
+    <div class="toolbar">
+        <a class="button" href="gis.html" title="3D MapBox" id="map-button">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"><path d="M19.3,16.9c0.4-0.7,0.7-1.5,0.7-2.4c0-2.5-2-4.5-4.5-4.5S11,12,11,14.5s2,4.5,4.5,4.5c0.9,0,1.7-0.3,2.4-0.7l3.2,3.2 l1.4-1.4L19.3,16.9z M15.5,17c-1.4,0-2.5-1.1-2.5-2.5s1.1-2.5,2.5-2.5s2.5,1.1,2.5,2.5S16.9,17,15.5,17z M12,20v2 C6.48,22,2,17.52,2,12C2,6.48,6.48,2,12,2c4.84,0,8.87,3.44,9.8,8h-2.07c-0.64-2.46-2.4-4.47-4.73-5.41V5c0,1.1-0.9,2-2,2h-2v2 c0,0.55-0.45,1-1,1H8v2h2v3H9l-4.79-4.79C4.08,10.79,4,11.38,4,12C4,16.41,7.59,20,12,20z"/></svg>
+        </a>
+        <a class="button" title="Dimensiones" id="dim-button">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"><path d="M21 6H3c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 10H3V8h2v4h2V8h2v4h2V8h2v4h2V8h2v4h2V8h2v8z"/></svg>
+        </a>
+        <a class="button"  title="Recortar" id="cut-button">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"><path d="M14.686 13.646l-6.597 3.181c-1.438.692-2.755-1.124-2.755-1.124l6.813-3.287 2.539 1.23zm6.168 5.354c-.533 0-1.083-.119-1.605-.373-1.511-.731-2.296-2.333-1.943-3.774.203-.822-.23-.934-.891-1.253l-11.036-5.341s1.322-1.812 2.759-1.117c.881.427 4.423 2.136 7.477 3.617l.766-.368c.662-.319 1.094-.43.895-1.252-.351-1.442.439-3.043 1.952-3.77.521-.251 1.068-.369 1.596-.369 1.799 0 3.147 1.32 3.147 2.956 0 1.23-.766 2.454-2.032 3.091-1.266.634-2.15.14-3.406.75l-.394.19.431.21c1.254.614 2.142.122 3.404.759 1.262.638 2.026 1.861 2.026 3.088 0 1.64-1.352 2.956-3.146 2.956zm-1.987-9.967c.381.795 1.459 1.072 2.406.617.945-.455 1.405-1.472 1.027-2.267-.381-.796-1.46-1.073-2.406-.618-.946.455-1.408 1.472-1.027 2.268zm-2.834 2.819c0-.322-.261-.583-.583-.583-.321 0-.583.261-.583.583s.262.583.583.583c.322.001.583-.261.583-.583zm5.272 2.499c-.945-.457-2.025-.183-2.408.611-.381.795.078 1.814 1.022 2.271.945.458 2.024.184 2.406-.611.382-.795-.075-1.814-1.02-2.271zm-18.305-3.351h-3v2h3v-2zm4 0h-3v2h3v-2z"/></svg>
+        </a>
+        <a class="button"  title="Paleta colores" id="palette-button">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 16 16"><path d="M8 5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zm4 3a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zM5.5 7a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm.5 6a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3z"/> <path d="M16 8c0 3.15-1.866 2.585-3.567 2.07C11.42 9.763 10.465 9.473 10 10c-.603.683-.475 1.819-.351 2.92C9.826 14.495 9.996 16 8 16a8 8 0 1 1 8-8zm-8 7c.611 0 .654-.171.655-.176.078-.146.124-.464.07-1.119-.014-.168-.037-.37-.061-.591-.052-.464-.112-1.005-.118-1.462-.01-.707.083-1.61.704-2.314.369-.417.845-.578 1.272-.618.404-.038.812.026 1.16.104.343.077.702.186 1.025.284l.028.008c.346.105.658.199.953.266.653.148.904.083.991.024C14.717 9.38 15 9.161 15 8a7 7 0 1 0-7 7z"/> </svg>
+        </a>
+        <a class="button"  title="Claro - Oscuro" id="lightdark-button">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 22 22"><path d="M12 16C14.2091 16 16 14.2091 16 12C16 9.79086 14.2091 8 12 8V16Z" fill="currentColor" /> <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2ZM12 4V8C9.79086 8 8 9.79086 8 12C8 14.2091 9.79086 16 12 16V20C16.4183 20 20 16.4183 20 12C20 7.58172 16.4183 4 12 4Z" fill="currentColor" /> </svg>
+        </a>
+        <a class="button"  title="Mostrar - Ocultar" id="showhide-button">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 22 22"><path d="M12.81 4.36l-1.77 1.78a4 4 0 0 0-4.9 4.9l-2.76 2.75C2.06 12.79.96 11.49.2 10a11 11 0 0 1 12.6-5.64zm3.8 1.85c1.33 1 2.43 2.3 3.2 3.79a11 11 0 0 1-12.62 5.64l1.77-1.78a4 4 0 0 0 4.9-4.9l2.76-2.75zm-.25-3.99l1.42 1.42L3.64 17.78l-1.42-1.42L16.36 2.22z"/></svg>
+        </a>        
+        <a class="button" title="Árbol del modelo" id="propTree-button">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 48 48"><rect width="48" height="48" fill="white" fill-opacity="0.01"/><rect x="18" y="20" width="20" height="8" fill="black" stroke="#333" stroke-width="1" stroke-linejoin="round"/><rect x="18" y="6" width="14" height="8" fill="black" stroke="#333" stroke-width="1" stroke-linejoin="round"/><rect x="18" y="34" width="26" height="8" fill="black" stroke="#333" stroke-width="1" stroke-linejoin="round"/><path d="M17 10H5" stroke="#333" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/><path d="M17 24H5" stroke="#333" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/><path d="M17 38H5" stroke="#333" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 44V4" stroke="#333" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+        <a class="button" title="Propiedades" id="prop-button">          
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 16 16"><path d="M1.5 0A1.5 1.5 0 0 0 0 1.5v2A1.5 1.5 0 0 0 1.5 5h13A1.5 1.5 0 0 0 16 3.5v-2A1.5 1.5 0 0 0 14.5 0h-13zm1 2h3a.5.5 0 0 1 0 1h-3a.5.5 0 0 1 0-1zm9.927.427A.25.25 0 0 1 12.604 2h.792a.25.25 0 0 1 .177.427l-.396.396a.25.25 0 0 1-.354 0l-.396-.396zM0 8a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V8zm1 3v2a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2H1zm14-1V8a1 1 0 0 0-1-1H2a1 1 0 0 0-1 1v2h14zM2 8.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zm0 4a.5.5 0 0 1 .5-.5h6a.5.5 0 0 1 0 1h-6a.5.5 0 0 1-.5-.5z"/> </svg>
+        </a>        
+        <a class="button" title="Ayuda" id="guide-button">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"><path d="M13 22H10V19H13V22ZM13 17H10V16.993C10 15.343 10 13.918 10.672 12.92C11.1948 12.2574 11.8453 11.7065 12.585 11.3C12.919 11.086 13.234 10.883 13.499 10.672C14.6604 9.77306 15.1826 8.27392 14.831 6.84799C14.2747 5.51815 12.8593 4.76357 11.4451 5.04296C10.0309 5.32236 9.00877 6.55851 9 7.99999H6C6 4.68629 8.68629 1.99997 12 1.99997C14.3053 1.99307 16.4134 3.29894 17.434 5.36599C18.3507 7.47212 17.9883 9.91642 16.5 11.666C16.0475 12.1675 15.5396 12.616 14.986 13.003C14.5016 13.3371 14.0597 13.729 13.67 14.17C13.1193 15.0045 12.8819 16.0071 13 17Z" fill="black"/> </svg>
+        </a>
+    </div>
+  </div>
+  
+  <footer class="fixed w-screen bottom-0 flex items-left left z-10 pointer-events-none">
+      <div class="px-2 bg-neutral-200 bg-opacity-50">
+        <p><small>3D BIM Foco en Obra © 2023</small></p>
+      </div>      
+  </footer>
+  
+  <script src="bundle/bundle.js"></script>
+</body>
+</html>

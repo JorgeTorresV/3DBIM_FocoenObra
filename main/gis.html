@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" href="static/favicon.ico">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://api.mapbox.com/mapbox-gl-js/v2.10.0/mapbox-gl.css" rel="stylesheet">
+    <script src="https://api.mapbox.com/mapbox-gl-js/v2.10.0/mapbox-gl.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Load the `mapbox-gl-geocoder` plugin. -->
+    <script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.min.js"></script>
+    <link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.css" type="text/css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <title>3D BIM Foco en Obra</title>
+</head>
+<body>
+    <div class="relative w-screen h-screen" id="map"></div>
+
+    <div class="absolute bottom-2 right-2 z-10 flex flex-col items-start gap-2">
+        <div class="flex flex-col items-start gap-2 p-2 rounded-xl shadow-xl">
+            <button class="button bottom-56 z-10 p-4 bg-white text-blue-500 rounded-full shadow-xl flex items-center justify-center" id="markerVis"  title="Referencia">
+            <span class="material-icons material-icons-outlined">
+                location_on
+            </span>
+            <div id="markerVisText"></div>          
+            </button>
+            <button class="button bottom-40 z-10 p-4 bg-white text-blue-500 rounded-full shadow-xl flex items-center justify-center" id="fly"  title="Viajar al modelo">
+            <span class="material-icons material-icons-outlined">
+                rocket_launch
+            </span>
+            <div id="flyText"></div>
+            </button>          
+            <a class="button bottom-24 z-10 p-4 bg-blue-500 text-white rounded-full shadow-xl flex items-center justify-center" href='index.html' title="3D BIM Foco en Obra">
+                <span class="material-icons material-symbols-outlined">
+                    apartment
+                </span>                
+            </a>          
+        </div>
+      </div>    
+
+    <footer class="fixed w-screen bottom-0 flex items-left left z-10 pointer-events-none">
+        <div class="px-2 bg-neutral-200 bg-opacity-50">
+          <p><small>3D BIM Foco en Obra © 2023</small></p>
+        </div>      
+    </footer>
+
+    <script src="bundle/gis.js"></script>
+</body>
+</html>
