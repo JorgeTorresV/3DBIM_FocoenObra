@@ -66,7 +66,7 @@ $ npm run build
 
 ## Enlaces relacionados y material de interés
 
-#### **Web viewer**
+#### **Web viewer IFC**
 
 DiStellar  
 https://distellar.diroots.com/
@@ -79,10 +79,13 @@ https://extraordinary-belekoy-ee7fa8.netlify.app/
 
 #### **GitHub**
 
-Ejercicios del curso intensivo de IFC.js.  
+Ejercicios curso intensivo de IFC.js.  
 https://github.com/IFCjs/ifcjs-crash-course
 
-El demo desarrollado tiene como base el siguiente repositorio  
+Ejercicios del repositorio IFC.js  
+https://github.com/JorgeTorresV/ifc_3dvisor
+
+El demo tiene como base el siguiente repositorio  
 https://github.com/helenkwok/bim-gis-viewer/tree/main
 
 
@@ -102,10 +105,6 @@ https://www.youtube.com/watch?v=dYGJRYunHk4&list=PLbFY94gzUJhGkxOUZknWupIiBnY5A0
 
 Dealing with Large BIM Models Using The BlenderBIM Add-on  
 https://www.youtube.com/watch?v=9x9ZkEo8gng
-
-
-Honorable Mención en IFC.js Crash Course 1st Edition Hackathon:  
- [LinkedIn](https://www.linkedin.com/posts/antonio-gonz%C3%A1lez-viegas-8b2326151_openbim-opensource-activity-6974052235869618176-YJH-/)
 
 
 ## Créditos
